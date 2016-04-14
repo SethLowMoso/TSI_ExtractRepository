@@ -1,4 +1,9 @@
+
+--CREATE PROCEDURE sp_Reporting_TSI_NetMemberCount_v2
 ALTER PROCEDURE sp_Reporting_TSI_NetMemberCount_v2 
+
+/*
+	These filters are standard with the extract however they are not required for this to function. The final extract will have no date of BU filters on it.
 --	--@StartDate DATETIME = NULL,
 --	--@EndDate DATETIME = NULL,
 --	--@UserBusinessUnitID INT = 1,
@@ -9,7 +14,7 @@ ALTER PROCEDURE sp_Reporting_TSI_NetMemberCount_v2
 ----		,@toDateLocal DATE 
 ----		,@userBusinessUnitId INT = 1
 ----		,@filterBusinessUnitId INT = NULL
-
+*/
 AS
 BEGIN
 	SET NOCOUNT ON;
