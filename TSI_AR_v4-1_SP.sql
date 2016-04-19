@@ -10,20 +10,22 @@
 ----	This script should wipe the AR Staging table and repopulate
 		
 ---- ============================================= */
---ALTER PROCEDURE [dbo].[sp_Reporting_TSI_AR_SP_v4] 
-------ALTER PROCEDURE Tenant_TSI.dbo.TSI_AR_SP_v4
- --      @AsOfDate DATETIME 
-
---AS
---BEGIN
+ALTER PROCEDURE [dbo].[TSI_AR_SP_v4] 
+	@AsOfDate DATETIME = NULL
+	
+AS
+BEGIN
        SET NOCOUNT ON;
 
----->>>These are for testing purposes
-			DECLARE @AsOfDate DATETIME  = '4/5/2016'---CONVERT(DATE,GETDATE(),101);
+------>>>These are for testing purposes
+--			--DECLARE @AsOfDate DATETIME  = CONVERT(DATE,GETDATE(),101);
 
-			DECLARE @TestBit bit = 1,
+
+			SELECT @AsOfDate = ISNULL(@AsOfDate, GETDATE())
+
+			DECLARE @TestBit bit = 0,
 					@ScrapYard bit = 0,
-					@RoleID VARCHAR(20) =  null -- '5248798'; -- '1564653';
+					@RoleID VARCHAR(20) = NULL--'3820771' --null -- '5248798'; -- '1564653';
 /***************************************************************************
 -- All Invoices with Balance Calculated
 ***************************************************************************/
@@ -172,7 +174,7 @@
 				LEFT JOIN Tenant_TSI.dbo.Agreement						a2		 (NOLOCK) ON a2.AgreementID = m2.AgreementID
 				LEFT JOIN Tenant_TSI.dbo.PartyPropertiesReporting		pp		 (NOLOCK) ON p2.PartyID = pp.PartyId
 				WHERE 1=1
-					--AND oii.MemberID = '5248798'
+					--AND oii.MemberID = '3820771'
 				GROUP BY p.RoleID
 						, p2.RoleID
 						, m.MemberAgreementID
@@ -514,10 +516,11 @@ if (object_id('tempdb..#OpenInvByItem') is not null) drop table #OpenInvByItem;
 					, oii.FirstName
 					, oii.LastName
 					--, ai2.RoleType
-					, CASE
-						WHEN ai2.RoleType IS NOT NULL THEN ''--ai2.CorporateName
-						ELSE oii.OrganizationName
-						END AS OrganizationName
+					--, CASE
+					--	WHEN ai2.RoleType IS NOT NULL THEN ''--ai2.CorporateName
+					--	ELSE oii.OrganizationName
+					--	END AS OrganizationName
+					, oii.OrganizationName
 					, oii.Email
 					, oii.MobilePhone
 					, oii.WorkPhone
@@ -720,50 +723,39 @@ if (object_id('tempdb..#OpenInvByItem') is not null) drop table #OpenInvByItem;
 ********************************************************************************************************************/
 			DECLARE @UpdatedRecords INT = (	SELECT COUNT(*)	FROM #FinalResults 	WHERE ReportDate = @AsOfDate );
 			
-			--IF (@UpdatedRecords > 0 AND @TestBit = 0)
-			--	BEGIN 
-			--			--->>> Clean out table
-			--			--DELETE 
-			--			--FROM [dbo].[TSI_ARStagingv4]
+			IF (@UpdatedRecords > 0 AND @TestBit = 0)
+				BEGIN 
+					BEGIN TRAN
+						--->>> Clean out table
+						DELETE 
+						FROM [dbo].[TSI_ARStagingv4]
 
-			--			IF (Object_ID('TSI_Tactical.dbo.TSI_ARStagingv4') IS NOT NULL) DROP TABLE TSI_Tactical.[dbo].[TSI_ARStagingv4];
+						--->>> Insert New Data
+						INSERT INTO [dbo].[TSI_ARStagingv4]
+							--(Division, Location, LocationGL, MemberID, FirstName, LastName, OrganizationName, Email, MobilePhone, WorkPhone, HomePhone, Address1, Address2, Address3, City, StateProvince, PostalCode, ClientAccountId, InvoiceNumber, InvoiceDate, DueDate, InvoiceLineItem, InvoiceMemberAgreementID, InvAgrCancelDate, StartDate, AgreementType, InvoiceAgreementStatus, CreditCardDescription, CreditCardAbbreviation, CreditCardMask, ResponseCode, ResponseMessage, ARSource, ARDays, AgingCurrent, AR_31_to_60, AR_61_to_90, AR_91_to_120, AR_121_and_Up, TotalDue, ItemCode, ItemDescription, POSGL, rpt_POSGLCode, DeferredGL, RecurringGL, rpt_RecurringGL, Category, SubCategory, CheckInDateTime, CheckInID, LastCheckinID, CheckinLocation, ReportDate, ReportRunDate)
+						SELECT *
+						--INTO TSI_Tactical.dbo.Staging_BFX_ARStaging_v4
+						FROM #FinalResults fr
 
-			--			--->>> Insert New Data
-			--			--INSERT INTO TSI_Tactical.[dbo].[TSI_ARStagingv4]
-			--			--	(Division, Location, LocationGL, MemberID, FirstName, LastName, OrganizationName, Email, MobilePhone, WorkPhone, HomePhone, Address1, Address2, Address3, City, StateProvince, PostalCode, ClientAccountId, InvoiceNumber, InvoiceDate, DueDate, InvoiceLineItem, InvoiceMemberAgreementID, InvAgrCancelDate, StartDate, AgreementType, InvoiceAgreementStatus, CreditCardDescription, CreditCardAbbreviation, CreditCardMask, ResponseCode, ResponseMessage, ARSource, ARDays, AgingCurrent, AR_31_to_60, AR_61_to_90, AR_91_to_120, AR_121_and_Up, TotalDue, ItemCode, ItemDescription, POSGL, rpt_POSGLCode, DeferredGL, RecurringGL, rpt_RecurringGL, Category, SubCategory, CheckInDateTime, CheckInID, LastCheckinID, CheckinLocation, MostRecentMemberAgreement, MostRecentAgreementStatus, MostRecentAgreementName, MostRecentStartDate, CancelDate, [Primary/Add-on Agreement], PrimaryAgreement, PrimaryAgreementMemberID, PrimaryAgreementName, CorporateName, ReportDate, ReportRunDate)
-			--			SELECT *
-			--			INTO TSI_Tactical.[dbo].[TSI_ARStagingv4]
-			--			--INTO TSI_Tactical.Tenant_TSI.dbo.Staging_BFX_ARStaging_v4
-			--			--SELECT *
-			--			FROM #FinalResults fr
-			--			GROUP BY Division, Location, LocationGL, MemberID, FirstName, LastName, OrganizationName, Email, MobilePhone, WorkPhone, HomePhone, Address1, Address2, Address3, City, StateProvince, PostalCode, ClientAccountId, InvoiceNumber, InvoiceDate, DueDate, InvoiceLineItem, InvoiceMemberAgreementID, InvAgrCancelDate, StartDate, AgreementType, InvoiceAgreementStatus, CreditCardDescription, CreditCardAbbreviation, CreditCardMask, ResponseCode, ResponseMessage, ARSource, ARDays, AgingCurrent, AR_31_to_60, AR_61_to_90, AR_91_to_120, AR_121_and_Up, TotalDue, ItemCode, ItemDescription, POSGL, rpt_POSGLCode, DeferredGL, RecurringGL, rpt_RecurringGL, Category, SubCategory, CheckInDateTime, CheckInID, LastCheckinID, CheckinLocation, MostRecentMemberAgreement, MostRecentAgreementStatus, MostRecentAgreementName, MostRecentStartDate, CancelDate, [Primary/Add-on Agreement], PrimaryAgreement, PrimaryAgreementMemberID, PrimaryAgreementName, CorporateName, ReportDate, ReportRunDate
+						--DROP TABLE #ARAgreementInfo;
+						DROP TABLE #ARPaymentTrans;
+						DROP TABLE #OpenInv;
+						DROP TABLE #OpenInvByItem;
+						DROP TABLE #FinalResults;
 
-			--			--DROP TABLE #ARAgreementInfo;
-			--			--DROP TABLE #ARPaymentTrans;
-			--			--DROP TABLE #OpenInv;
-			--			--DROP TABLE #OpenInvByItem;
-			--			--DROP TABLE #FinalResults;
-
-			--	END
+					COMMIT TRAN
+				END
 
 			IF (@TestBit = 1)
 				BEGIN
-						
-
 						SELECT *
-						--INTO TSI_Tactical.dbo.Storage_TSI_AR_v4
-						FROM #FinalResults 
-						--WHERE OrganizationName != ''
-													
-
-
-								
+						FROM #FinalResults fr
 
 				END
 
 
 			  
---END
+END
 
 
 --go
