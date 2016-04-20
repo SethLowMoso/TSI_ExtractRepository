@@ -194,7 +194,7 @@ select ma.MemberAgreementId,
 				b.Code,
 				b.Name,
 				p.ReferredByPartyRoleID
-
+--0:00:40.000
 
 
 			Update #Result
@@ -211,7 +211,7 @@ select ma.MemberAgreementId,
 			inner join Tenant_TSI.dbo.TxInvoice i on r.TxInvoiceId = i.TxInvoiceID
 			inner join Tenant_TSI.dbo.WorkUnit wu on wu.WorkUnitID = i.WorkUnitId
 
-
+--0:00:54.000
 
 
 	--Update the demographic data for Sales_XXX
@@ -227,7 +227,7 @@ select ma.MemberAgreementId,
 			inner join Tenant_TSI.dbo.PartyRole pr on pr.PartyID = ua.PartyID
 			inner join Tenant_TSI.dbo.ReportingEmployeeCharacteristics e on e.PartyId = pr.PartyId
 			
-			
+--0:00:25.000			
 --------  PIN USER DATA
 			Update #Result
 			set PIN_UserID = wu.AuthenticatedUserId-- FLIP HERE To Use PIN User
@@ -235,6 +235,7 @@ select ma.MemberAgreementId,
 			inner join Tenant_TSI.dbo.TxInvoice i on r.TxInvoiceId = i.TxInvoiceID
 			inner join Tenant_TSI.dbo.WorkUnit wu on wu.WorkUnitID = i.WorkUnitId
 
+--0:00:04.000
 
 			--Update the demographic data for PIN Owner
 			Update #Result 
@@ -249,7 +250,7 @@ select ma.MemberAgreementId,
 			inner join Tenant_TSI.dbo.PartyRole pr on pr.PartyID = ua.PartyID
 			inner join Tenant_TSI.dbo.ReportingEmployeeCharacteristics e on e.PartyId = pr.PartyID		
 			
-
+--0:00:28.000
 
 			
 			 
@@ -270,7 +271,7 @@ select ma.MemberAgreementId,
 			 from cte_WorkRoles wr
 				inner join #Result r on r.Sales_PartyId = wr.PartyId;
 
-
+--0:00:13.000
 
 
 	--Handles Demographic information for Referrals
@@ -302,7 +303,7 @@ select ma.MemberAgreementId,
 				inner join #Result r on r.REFERRAL_PARTYROLEID1 = c.REFERRAL_PARTYROLEID1
 			Where r.REFERRAL_PARTYROLEID1 is not null;
 
-
+--0:00:11.000
 
 
 
@@ -326,7 +327,7 @@ select ma.MemberAgreementId,
 				inner join #Result r on r.REFERRAL_PARTYID1 = wr.PartyId
 			where r.REFERRAL_PARTYID1 is not null;
 
-
+--0:00:00.000
 
 
 	---Update the demographic data for Advisor_XXX
@@ -343,7 +344,7 @@ select ma.MemberAgreementId,
 			where sa.Sequence = 1;
 
 	
-
+--0:00:25.000
 
 	--Handles the work roles for Advisor_XXX
 			;with 
@@ -363,7 +364,7 @@ select ma.MemberAgreementId,
 			 from cte_WorkRoles wr
 				inner join #Result r on r.Sales_PartyId = wr.PartyId;
 
-
+--0:00:11.000
 
 
 	---Calc first bill date
@@ -380,7 +381,7 @@ select ma.MemberAgreementId,
 			from cte_FirstInvoiceDate c 
 				inner join #Result r on r.MemberAgreementId = c.MemberAgreementId
 
-
+--0:00:44.000
 
 
 	---Update Monthly Dues
@@ -397,6 +398,7 @@ select ma.MemberAgreementId,
 			from cte_FirstValues c
 			inner join #Result r on r.MemberAgreementId = c.MemberAgreementId;
 
+--0:00:15.000
 
 
 			DECLARE @Count INT = ISNULL((SELECT COUNT(*) FROM #Result),0);
