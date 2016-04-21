@@ -1,6 +1,6 @@
 
 --CREATE PROCEDURE sp_Reporting_TSI_NetMemberCount_v2
-ALTER PROCEDURE sp_Reporting_TSI_NetMemberCount_v2 
+--ALTER PROCEDURE sp_Reporting_TSI_NetMemberCount_v2 
 
 /*
 	These filters are standard with the extract however they are not required for this to function. The final extract will have no date of BU filters on it.
@@ -15,9 +15,11 @@ ALTER PROCEDURE sp_Reporting_TSI_NetMemberCount_v2
 ----		,@userBusinessUnitId INT = 1
 ----		,@filterBusinessUnitId INT = NULL
 */
-AS
-BEGIN
-	SET NOCOUNT ON;
+--AS
+--BEGIN
+	--SET NOCOUNT ON;
+
+		DECLARE @Test BIT = 1;
 
 if (object_id('tempdb..#Result') is not null) drop table #Result;
 
@@ -160,7 +162,7 @@ select ma.MemberAgreementId,
 				) cf 
 
 			where 1=1 
-				--AND p.RoleID IN ('8622477','771828')
+				--AND p.RoleID IN ('5768872')--'8622477','771828')
 				---Exclusion List
 				AND reb.ExclusionID IS NULL
 				AND rea.ExclusionID IS NULL
@@ -403,7 +405,7 @@ select ma.MemberAgreementId,
 
 			DECLARE @Count INT = ISNULL((SELECT COUNT(*) FROM #Result),0);
 
-IF (@Count > 0)
+IF (@Count > 0 AND @Test = 0)
 				BEGIN
 					TRUNCATE TABLE TSI_Tactical.dbo.Reporting_NetMemberCount_v2
 
@@ -455,6 +457,14 @@ IF (@Count > 0)
 					
 				END
 
+	IF (@Test = 1)
+		BEGIN
 
+			--SELECT DISTINCT	SALES_ROLEID, SALES_FIRSTNAME, SALES_LASTNAME, SALES_PAYROLLID, SALES_WORKROLE
+			SELECT *
+			FROM #Result r
+			--WHERE r.SALES_WORKROLE IS NULL
 
-END	
+		END
+
+--END	
