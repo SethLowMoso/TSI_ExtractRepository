@@ -1,6 +1,6 @@
 
 --CREATE PROCEDURE sp_Reporting_TSI_NetMemberCount_v2
---ALTER PROCEDURE sp_Reporting_TSI_NetMemberCount_v2 
+ALTER PROCEDURE sp_Reporting_TSI_NetMemberCount_v2 
 
 /*
 	These filters are standard with the extract however they are not required for this to function. The final extract will have no date of BU filters on it.
@@ -15,9 +15,9 @@
 ----		,@userBusinessUnitId INT = 1
 ----		,@filterBusinessUnitId INT = NULL
 */
---AS
---BEGIN
-	--SET NOCOUNT ON;
+AS
+BEGIN
+	SET NOCOUNT ON;
 
 		DECLARE @Test BIT = 1;
 
@@ -156,7 +156,7 @@ select ma.MemberAgreementId,
 					FROM Tenant_TSI.dbo.Cancellation oc2
 					WHERE oc2.EntityId = ma.MemberAgreementID 
 						AND oc2.EntityIdType = 1
-						AND oc2.Date > GETDATE()
+						AND oc2.Date >= GETDATE()
 						AND oc2.StateID NOT IN (4,8,6)
 					ORDER BY CancellationID DESC
 				) cf 
@@ -467,4 +467,4 @@ IF (@Count > 0 AND @Test = 0)
 
 		END
 
---END	
+END	
