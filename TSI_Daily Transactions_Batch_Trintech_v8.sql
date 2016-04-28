@@ -9,7 +9,7 @@ For full billing month dates should be set
 	@CurrentWaterMark = 1/1/2016
 	@NewWaterMark = 2/1/2016
 ***************************************************************************************************************************/
-CREATE PROCEDURE dbo.sp_Reporting_DailyTransactions_Trintech_BATCH_v8
+ALTER PROCEDURE dbo.sp_Reporting_DailyTransactions_Trintech_BATCH_v8
 	@CurrentWaterMark DATETIME = NULL, --This is the begin time
 	@NewWaterMark DATETIME = NULL OUTPUT --This is the end time
 	
@@ -37,7 +37,10 @@ IF( OBJECT_ID('tempdb..#Str_PaymentTarget') IS NOT NULL) DROP TABLE #Str_Payment
 
 	--, @Help BIT = 0
 
-
+	IF(@CurrentWaterMark IS NULL)
+		BEGIN
+			SET @CurrentWaterMark = DATEADD(DAY, -1, CONVERT(DATE,GETDATE(),101))
+		END
 	SET @NewWaterMark = IIF(@NewWaterMark IS NULL ,DATEADD(d, 1, @CurrentWaterMark), @NewWaterMark)
  
 
@@ -193,4 +196,4 @@ IF (@Help = 1)
 	END
 	
 
---END
+END

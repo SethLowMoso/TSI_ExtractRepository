@@ -31,7 +31,10 @@ if (object_id('tempdb..#STR_PaymentData') is not null) drop table #STR_PaymentDa
 --	--, @MosoPayRef VARCHAR(50) = NULL --This has been commented out due to it causing certain results to drop out. 
 --	, @PaymentID INT = 16864700
 --	, @Member VARCHAR(20) = NULL
-
+	IF(@CurrentWaterMark IS NULL)
+		BEGIN
+			SET @CurrentWaterMark = DATEADD(DAY, -1, CONVERT(DATE,GETDATE(),101))
+		END
 	SET @NewWaterMark = IIF(@NewWaterMark IS NULL ,DATEADD(d, 1, @CurrentWaterMark), @NewWaterMark)
 	
 
@@ -207,4 +210,4 @@ if (object_id('tempdb..#STR_PaymentData') is not null) drop table #STR_PaymentDa
 --		PRINT N'@MosoPayRef: (OPTIONAL) The REFERENCE field on TxPayment for the transaction in question, defaulted to NULL'
 --	END
 
---END
+END
