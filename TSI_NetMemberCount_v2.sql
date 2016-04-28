@@ -19,7 +19,7 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-		DECLARE @Test BIT = 1;
+		DECLARE @Test BIT = 0;
 
 if (object_id('tempdb..#Result') is not null) drop table #Result;
 
@@ -407,9 +407,9 @@ select ma.MemberAgreementId,
 
 IF (@Count > 0 AND @Test = 0)
 				BEGIN
-					--TRUNCATE TABLE TSI_Tactical.dbo.Reporting_NetMemberCount_v2
+					TRUNCATE TABLE TSI_Tactical.dbo.Reporting_NetMemberCount_v2
 
-					--INSERT INTO TSI_Tactical.dbo.Reporting_NetMemberCount_v2
+					INSERT INTO TSI_Tactical.dbo.Reporting_NetMemberCount_v2
 					select MemberAgreementId
 						, AgreementStatus
 						, PartyRoleId
