@@ -9,7 +9,7 @@ For full billing month dates should be set
 	@CurrentWaterMark = 1/1/2016
 	@NewWaterMark = 2/1/2016
 ***************************************************************************************************************************/
-ALTER PROCEDURE dbo.sp_Reporting_DailyTransactions_Trintech_POS_v8
+CREATE PROCEDURE dbo.sp_Reporting_DailyTransactions_Trintech_POS_v8
 	@CurrentWaterMark DATETIME = NULL, --This is the begin time
 	@NewWaterMark DATETIME = NULL OUTPUT --This is the end time
 	
@@ -65,12 +65,12 @@ if (object_id('tempdb..#STR_PaymentData') is not null) drop table #STR_PaymentDa
 					, ef.ResponseCode
 					, ef.ResponseMessage
 					, pr.PaymentProcessRequestID AS MOSOPayTransactionCode
-			FROM Tenant_TSI.dbo.TxPayment p (NOLOCK)
-			LEFT JOIN Tenant_TSI.dbo.TxPaymentEft ef (NOLOCK) ON ef.TxPaymentId = p.TxPaymentID  --->>> Shifted to LEFT To include Chargeback reversals
-			LEFT JOIN Tenant_TSI.dbo.TxTransaction t (NOLOCK) ON t.ItemID = p.TxPaymentID AND t.TxTypeId = 4
-			LEFT JOIN Tenant_TSI.dbo.PaymentProcessRequest pr (NOLOCK) ON pr.TxPaymentID = p.TxPaymentID
-			LEFT JOIN Tenant_TSI.dbo.PartyRole r (NOLOCK) ON r.PartyRoleID = p.PartyRoleId
-			LEFT JOIN Tenant_TSI.dbo.BusinessUnit b (NOLOCK) ON b.BusinessUnitId = p.TargetBusinessUnitId
+			FROM dbo.TxPayment p (NOLOCK)
+			LEFT JOIN dbo.TxPaymentEft ef (NOLOCK) ON ef.TxPaymentId = p.TxPaymentID  --->>> Shifted to LEFT To include Chargeback reversals
+			LEFT JOIN dbo.TxTransaction t (NOLOCK) ON t.ItemID = p.TxPaymentID AND t.TxTypeId = 4
+			LEFT JOIN dbo.PaymentProcessRequest pr (NOLOCK) ON pr.TxPaymentID = p.TxPaymentID
+			LEFT JOIN dbo.PartyRole r (NOLOCK) ON r.PartyRoleID = p.PartyRoleId
+			LEFT JOIN dbo.BusinessUnit b (NOLOCK) ON b.BusinessUnitId = p.TargetBusinessUnitId
 			LEFT JOIN [TSI_tactical].[dbo].[Staging_ReportExclusionStaging] es (NOLOCK) ON es.ReportName = 'TSI_Daily_Transactions_POS_Trintech'
 																							AND es.Deleted = 0
 																							AND es.Criteria = 'TenderTypeID'
@@ -156,12 +156,12 @@ if (object_id('tempdb..#STR_PaymentData') is not null) drop table #STR_PaymentDa
 			--INTO #Temp
 			FROM CTE_PaymentData p
 				LEFT JOIN [METAALIAS].FocusMeta.dbo.CreditCardType as cct on p.CreditCardTypeId = cct.CreditCardTypeID 
-				LEFT JOIN Tenant_TSI.dbo.PartyRole pr ON pr.PartyRoleId = p.PartyRoleId
-				LEFT JOIN Tenant_TSI.dbo.TenderType tt ON p.TenderTypeID = tt.TenderTypeID
-				LEFT JOIN Tenant_TSI.dbo.GeneralLedgerCode g ON g.GeneralLedgerCodeId = tt.GeneralLedgerCodeId
-				LEFT JOIN Tenant_TSI.dbo.BusinessUnit b (NOLOCK) ON b.BusinessUnitId = p.TargetBusinessUnitID
+				LEFT JOIN dbo.PartyRole pr ON pr.PartyRoleId = p.PartyRoleId
+				LEFT JOIN dbo.TenderType tt ON p.TenderTypeID = tt.TenderTypeID
+				LEFT JOIN dbo.GeneralLedgerCode g ON g.GeneralLedgerCodeId = tt.GeneralLedgerCodeId
+				LEFT JOIN dbo.BusinessUnit b (NOLOCK) ON b.BusinessUnitId = p.TargetBusinessUnitID
 				LEFT JOIN TSI_Tactical.dbo.Ref_TSI_MIDs_Reference mid (NOLOCK) ON  b.GLCodePrefix = mid.OrgID
-				LEFT JOIN Tenant_TSI.dbo.TxInvoice i ON i.TxInvoiceID = p.TxInvoiceId
+				LEFT JOIN dbo.TxInvoice i ON i.TxInvoiceID = p.TxInvoiceId
 			WHERE 1=1
 
 			GROUP BY 

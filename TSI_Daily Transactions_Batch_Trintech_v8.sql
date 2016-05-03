@@ -9,7 +9,7 @@ For full billing month dates should be set
 	@CurrentWaterMark = 1/1/2016
 	@NewWaterMark = 2/1/2016
 ***************************************************************************************************************************/
-ALTER PROCEDURE dbo.sp_Reporting_DailyTransactions_Trintech_BATCH_v8
+CREATE PROCEDURE dbo.sp_Reporting_DailyTransactions_Trintech_BATCH_v8
 	@CurrentWaterMark DATETIME = NULL, --This is the begin time
 	@NewWaterMark DATETIME = NULL OUTPUT --This is the end time
 	
@@ -62,10 +62,10 @@ IF( OBJECT_ID('tempdb..#Str_PaymentTarget') IS NOT NULL) DROP TABLE #Str_Payment
 						, t.TxInvoiceID
 						, tp.IsDeclined
 						, tp.PartyRoleId
-				FROM Tenant_TSI.dbo.PaymentProcessRequest p (NOLOCK) 
-				INNER JOIN Tenant_TSI.dbo.TxPayment tp (NOLOCK)  ON tp.TxPaymentId = p.TxPaymentID
-				INNER JOIN Tenant_TSI.dbo.PartyRole r (NOLOCK) ON r.PartyRoleID = tp.PartyRoleId 
-				LEFT JOIN Tenant_TSI.dbo.Txtransaction t (NOLOCK) ON t.ItemID = tp.TxPaymentID AND t.TxTypeId = 4
+				FROM dbo.PaymentProcessRequest p (NOLOCK) 
+				INNER JOIN dbo.TxPayment tp (NOLOCK)  ON tp.TxPaymentId = p.TxPaymentID
+				INNER JOIN dbo.PartyRole r (NOLOCK) ON r.PartyRoleID = tp.PartyRoleId 
+				LEFT JOIN dbo.Txtransaction t (NOLOCK) ON t.ItemID = tp.TxPaymentID AND t.TxTypeId = 4
 				LEFT JOIN [TSI_tactical].[dbo].[Staging_ReportExclusionStaging] es (NOLOCK) ON es.ReportName = 'TSI_Daily_Transaction_Batch_Trintech'
 																							AND es.Deleted = 0
 																							AND es.Criteria = 'TenderTypeID'
@@ -135,16 +135,16 @@ SELECT --TOP 100
 		, CAST(mid.[NEW RETAIL SE#] AS VARCHAR(50)) AS [NEW RETAIL SE#]
 		, IIF((p.IsDeclined = 1 AND res.ResponseCode LIKE 'A%'), 1, 0) AS Chargeback_ind
 FROM CTE_Paymenttarget p
-	INNER JOIN Tenant_TSI.dbo.TxInvoice i ON i.TxInvoiceid = p.TxInvoiceId
-	INNER JOIN Tenant_TSI.dbo.PaymentProcessResponse res ON res.PaymentProcessRequestId = p.MOSOPayTransactionCode
-	LEFT JOIN Tenant_TSI.dbo.TxPaymentEft ef ON ef.TxPaymentId = p.TxPaymentID  --->>> Converted to LEFT JOIN to address Chargeback reversals
+	INNER JOIN dbo.TxInvoice i ON i.TxInvoiceid = p.TxInvoiceId
+	INNER JOIN dbo.PaymentProcessResponse res ON res.PaymentProcessRequestId = p.MOSOPayTransactionCode
+	LEFT JOIN dbo.TxPaymentEft ef ON ef.TxPaymentId = p.TxPaymentID  --->>> Converted to LEFT JOIN to address Chargeback reversals
 
 	LEFT JOIN [METAALIAS].FocusMeta.dbo.CreditCardType as cct on p.CreditCardTypeId = cct.CreditCardTypeID 
-	LEFT JOIN Tenant_TSI.dbo.PartyRole pr ON pr.PartyRoleId = p.PartyRoleId
-	LEFT JOIN Tenant_TSI.dbo.TenderType tt ON p.TenderTypeID = tt.TenderTypeID
-	LEFT JOIN Tenant_TSI.dbo.GeneralLedgerCode g ON g.GeneralLedgerCodeId = tt.GeneralLedgerCodeId
+	LEFT JOIN dbo.PartyRole pr ON pr.PartyRoleId = p.PartyRoleId
+	LEFT JOIN dbo.TenderType tt ON p.TenderTypeID = tt.TenderTypeID
+	LEFT JOIN dbo.GeneralLedgerCode g ON g.GeneralLedgerCodeId = tt.GeneralLedgerCodeId
 
-	LEFT JOIN Tenant_TSI.dbo.BusinessUnit b (NOLOCK) ON b.BusinessUnitId = i.TargetBusinessUnitID
+	LEFT JOIN dbo.BusinessUnit b (NOLOCK) ON b.BusinessUnitId = i.TargetBusinessUnitID
 	LEFT JOIN TSI_Tactical.dbo.Ref_TSI_MIDs_Reference mid (NOLOCK) ON  b.GLCodePrefix = mid.OrgID
 WHERE 1=1
 GROUP BY 
